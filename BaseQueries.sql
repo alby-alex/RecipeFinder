@@ -1,0 +1,5 @@
+CREATE DATABASE RecipeFinder;
+GO
+
+USE DATABASE RecipeFinder;
+GO
