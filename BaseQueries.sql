@@ -67,6 +67,7 @@ CREATE TABLE Comment(
 CREATE TABLE Rating(
     UserID INT,
     RecipeID INT,
+    Value DECIMAL,
     CONSTRAINT pk_rating PRIMARY KEY (UserID, RecipeID),
     CONSTRAINT fk_rating_userid FOREIGN KEY (UserID) REFERENCES Users(UserID),
     CONSTRAINT fk_rating_recipeid FOREIGN KEY (RecipeID) REFERENCES Recipe(RecipeID)
@@ -102,4 +103,35 @@ ALTER TABLE Comment ADD CONSTRAINT chk_comment_text CHECK (LEN([Text]) < 300);
 
 ALTER TABLE RecipeIngredients ADD CONSTRAINT chk_recipeingredients_quantity CHECK (Quantity > 0);
 
+ALTER TABLE Rating ADD CONSTRAINT chk_rating_value CHECK (Value in (1.0, 2.0, 3.0, 4.0, 5.0));
 
+
+
+
+
+
+
+
+
+
+
+-- Queries
+SELECT u.Username, COUNT(RecipeID) FROM Users u INNER JOIN Recipe r ON u.UserID = r.UserID GROUP BY u.Username;
+
+SELECT u.Username, AVG(RecipeAvgs.RecipeRating) AS AvgUserRating FROM Users u INNER JOIN Recipe r ON u.UserID = r.UserID INNER JOIN (SELECT ra.RecipeID, AVG(ra.Value) AS RecipeRating FROM Rating ra GROUP BY ra.RecipeID) AS RecipeAvgs ON RecipeAvgs.RecipeID = r.RecipeID GROUP BY u.Username;
+
+SELECT t.Name, COUNT(i.IngredientID) FROM Tag t LEFT JOIN IngredientTag i ON t.TagID = i.TagID GROUP BY t.Name;
+
+SELECT i.Name, IngredientCount.CountVal FROM Ingredient i INNER JOIN (SELECT ri.IngredientID, COUNT(ri.RecipeID) AS CountVal FROM RecipeIngredients ri GROUP BY ri.IngredientID) AS IngredientCount ON i.IngredientID = IngredientCount.IngredientID;
+
+SELECT r.Name, COUNT(fr.UserID) FROM Recipe r LEFT JOIN FavoritedRecipe fr ON r.RecipeID = fr.RecipeID GROUP BY r.Name;
+
+SELECT u.username, COUNT(c.text) FROM Users u LEFT JOIN Comment c ON u.UserID = c.UserID GROUP BY u.username;
+
+SELECT * FROM RECIPE r WHERE r.UserID IN (SELECT f.followedsID FROM Follows f WHERE f.FollowersID = 1 );
+
+SELECT t.Name, COUNT(r.RecipeID) FROM Tag t LEFT JOIN RecipeTags r ON t.TagID = r.TagID GROUP BY t.Name;
+
+SELECT r.Name, (SELECT COUNT(ri.IngredientID) FROM RecipeIngredients ri WHERE ri.RecipeID = r.recipeID) FROM Recipe r;
+
+SELECT u.Username, COUNT(BlockersID) FROM Users u LEFT JOIN BlockedUser b ON u.UserID = b.BlockedID GROUP BY u.Username;
