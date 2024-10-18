@@ -1,3 +1,5 @@
+--Alby Alex, Charlotte Miller, Nazifa Rahman, Dylan Armstrong
+
 CREATE DATABASE RecipeFinder
 GO
 
